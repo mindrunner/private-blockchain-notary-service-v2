@@ -1,13 +1,13 @@
 {
-  "name": "project_1",
-  "version": "1.0.0",
-  "description": "This project creates a Blockchain application to store data into the blocks",
-  "main": "index.js",
+  "name": "private-blockchain",
+  "version": "0.2.0",
+  "description": "Blockchain has the potential to change the way that the world approaches data. Develop Blockchain skills by understanding the data model behind Blockchain by developing your own simplified private blockchain.",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Udacity - jose.morales@udacity.com",
-  "license": "ISC",
+  "author": "Lukas Elsner <open@mindrunner.de>",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "bitcoinjs-lib": "^4.0.3",
     "bitcoinjs-message": "^2.0.0",
@@ -15,6 +15,20 @@
     "crypto-js": "^3.1.9-1",
     "express": "^4.16.4",
     "hex2ascii": "0.0.3",
-    "morgan": "^1.9.1"
-  }
+    "morgan": "^1.9.1",
+    "level": "^4.0.0",
+    "mocha": "^5.2.0",
+    "should": "^13.2.3",
+    "sleep": "^5.2.3",
+    "supertest": "^3.3.0",
+    "bs58": "^4.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mindrunner/private-blockchain.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mindrunner/private-blockchain/issues"
+  },
+  "homepage": "https://github.com/mindrunner/private-blockchain#readme"
 }

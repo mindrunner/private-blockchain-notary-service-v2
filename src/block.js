@@ -54,7 +54,6 @@ class Block {
         if(this.height > 0) {
             return Buffer.from(this.body, "hex").toString("ascii");
         }
-
     }
 }
 

@@ -8,13 +8,12 @@
  *
  */
 
-import {Block} from "./block";
-
 const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
 const bitcoin = require("bitcoinjs-lib");
 const util = require('util');
+var bs58check = require('bs58check');
 
 const TimeoutRequestsWindowTime = 5 * 60 * 1000;
 
@@ -66,10 +65,13 @@ class Blockchain {
      * that this method is a private method.
      */
     async _addBlock(block) {
-        let height = await this.getChainHeight();
-        block.height = height + 1;
-        block.timestamp = parseInt(new Date().getTime().toString().slice(0, -3));
+        block.height = this.height + 1;
+        if (this.height > -1)
+            block.previousBlockHash = this.chain[this.height].hash;
+        block.time = parseInt(new Date().getTime().toString().slice(0, -3));
+        block.hash = SHA256(JSON.stringify(this)).toString();
         this.height++;
+        this.chain.push(block)
         return block;
     }
 
@@ -107,9 +109,15 @@ class Blockchain {
         let messageTime = parseInt(message.split(':')[1]);
         let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
         if (currentTime - messageTime > TimeoutRequestsWindowTime) return false;
-        if (!bitcoinMessage.verify(message, address, signature)) return false;
-        let block = new Block({address, signature, message, star});
+
+        try {
+            bitcoinMessage.verify(message, address, signature);
+        } catch (e) {
+            print(e)
+        }
+        let block = new BlockClass.Block({address, signature, message, star});
         await this._addBlock(block);
+        return block;
     }
 
     /**
@@ -119,7 +127,7 @@ class Blockchain {
      * @param {*} hash
      */
     getBlockByHash(hash) {
-        return self.chain.filter(p => p.hash === hash)[0];
+        return this.chain.filter(p => p.hash === hash)[0];
     }
 
     /**
@@ -128,7 +136,7 @@ class Blockchain {
      * @param {*} height
      */
     async getBlockByHeight(height) {
-        return self.chain.filter(p => p.height === height)[0];
+        return this.chain.filter(p => p.height === height)[0];
     }
 
     /**
@@ -139,8 +147,10 @@ class Blockchain {
      */
     async getStarsByWalletAddress(address) {
         let stars = [];
-        self.chain.filter(st => st.getBData().address === address).forEach(b => {
-            stars.push(b.star)
+        await this.chain.forEach(async b => {
+            let data = JSON.parse(await b.getBData());
+            if (data && data.address === address)
+                stars.push(data);
         });
         return stars;
     }
@@ -152,9 +162,8 @@ class Blockchain {
      * 2. Each Block should check the with the previousBlockHash
      */
     async validateChain() {
-        let self = this;
         let errorLog = [];
-        self.chain.forEach(b => {
+        this.chain.forEach(b => {
             if (!b.validate()) {
                 errorLog.push(b.height);
             }
@@ -163,4 +172,4 @@ class Blockchain {
     }
 }
 
-module.exports.Blockchain = Blockchain;   
+module.exports.Blockchain = Blockchain;
