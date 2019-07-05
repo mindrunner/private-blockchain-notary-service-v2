@@ -37,7 +37,9 @@ class Block {
      */
     async validate() {
         let hash = this.hash;
+        this.hash = null;
         let blockHash = SHA256(JSON.stringify(this)).toString();
+        this.hash = hash;
         return hash === blockHash
     }
 

@@ -163,8 +163,8 @@ class Blockchain {
      */
     async validateChain() {
         let errorLog = [];
-        this.chain.forEach(b => {
-            if (!b.validate()) {
+        this.chain.forEach(async b => {
+            if (!await b.validate()) {
                 errorLog.push(b.height);
             }
         });
