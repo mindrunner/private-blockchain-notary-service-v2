@@ -69,7 +69,7 @@ class Blockchain {
         if (this.height > -1)
             block.previousBlockHash = this.chain[this.height].hash;
         block.time = parseInt(new Date().getTime().toString().slice(0, -3));
-        block.hash = SHA256(JSON.stringify(this)).toString();
+        block.hash = SHA256(JSON.stringify(block)).toString();
         this.height++;
         this.chain.push(block)
         return block;
@@ -117,6 +117,7 @@ class Blockchain {
         }
         let block = new BlockClass.Block({address, signature, message, star});
         await this._addBlock(block);
+        await this.validateChain();
         return block;
     }
 
@@ -168,6 +169,11 @@ class Blockchain {
                 errorLog.push(b.height);
             }
         });
+        for(let i = 1; i < this.chain.length; ++i) {
+            if(this.chain[i].previousBlockHash !== this.chain[i - 1].hash) {
+                errorLog.push(i);
+            }
+        }
         return errorLog;
     }
 }
